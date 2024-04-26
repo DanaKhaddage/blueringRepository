@@ -7,6 +7,7 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -58,31 +59,51 @@ public class UserController {
         }
     }
 
+
+//    @GetMapping("/")
+//    public ResponseEntity<ApiResponse> getUser() {
+//        try {
+//            List<UserDTO> users = userService.getUser();
+//            return ResponseEntity
+//                    .ok(new ApiResponse(true, "Users retrieved successfully", users));
+//        } catch (Exception e) {
+//            return ResponseEntity
+//                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new ApiResponse(false, "Error retrieving users", e.getMessage()));
+//        }
+//    }
+//
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<ApiResponse> getUserById(@PathVariable Integer userId) {
+//        try {
+//            UserDTO user = userService.getUserById(userId);
+//            return ResponseEntity
+//                    .ok(new ApiResponse(true, "User retrieved successfully", user));
+//        } catch (Exception e) {
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body(new ApiResponse(false, "User not found", null));
+//        }
+//    }
+
     @GetMapping("/")
-    public ResponseEntity<ApiResponse> getUser() {
-        try {
-            List<UserDTO> users = userService.getUser();
-            return ResponseEntity
-                    .ok(new ApiResponse(true, "Users retrieved successfully", users));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Error retrieving users", e.getMessage()));
+    public List<UserDTO> getUsers() {
+        List<UserDTO> users = userService.getUsers();
+        if (users.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
         }
+        return users;
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse> getUserById(@PathVariable Integer userId) {
-        try {
-            UserDTO user = userService.getUserById(userId);
-            return ResponseEntity
-                    .ok(new ApiResponse(true, "User retrieved successfully", user));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse(false, "User not found", null));
+    public UserDTO getUserById(@PathVariable Integer userId) {
+        UserDTO userDTO = userService.getUserById(userId);
+        if (userDTO == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
+        return userDTO;
     }
+
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<ApiResponse> deleteUser(@PathVariable Integer userId) {

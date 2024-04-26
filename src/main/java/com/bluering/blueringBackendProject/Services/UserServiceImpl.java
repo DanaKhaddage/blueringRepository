@@ -58,10 +58,20 @@ class UserServiceImpl implements UserService {
         });
     }
 
-    public List<UserDTO> getUser(){
+//    public List<UserDTO> getUser(){
+//        List<UserEntity> userEntities = userRepository.findAll();
+//        return userEntities.stream()
+//                .map(userEntity  -> userMapper.userEntityToUserDTO(userEntity))
+//                .collect(Collectors.toList());
+//    }
+
+    public List<UserDTO> getUsers() {
         List<UserEntity> userEntities = userRepository.findAll();
+        if (userEntities.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
+        }
         return userEntities.stream()
-                .map(userEntity  -> userMapper.userEntityToUserDTO(userEntity))
+                .map(userEntity -> userMapper.userEntityToUserDTO(userEntity))
                 .collect(Collectors.toList());
     }
 
